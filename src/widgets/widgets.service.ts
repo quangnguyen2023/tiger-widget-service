@@ -7,6 +7,7 @@ import {
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
 import { widgetsTable } from 'src/db/schema';
+import { CreateWidgetDto, UpdateWidgetDto } from 'src/widgets/dto/widgets.dto';
 
 @Injectable()
 export class WidgetsService {
@@ -39,7 +40,7 @@ export class WidgetsService {
     }
   }
 
-  async create(createWidgetDto: typeof widgetsTable.$inferInsert) {
+  async create(createWidgetDto: CreateWidgetDto) {
     // Check if a widget already exists
     const existing = await this.db
       .select()
@@ -61,7 +62,7 @@ export class WidgetsService {
     }
   }
 
-  async update(id: string, updateWidgetDto: typeof widgetsTable.$inferInsert) {
+  async update(id: string, updateWidgetDto: UpdateWidgetDto) {
     try {
       const [result] = await this.db
         .update(widgetsTable)

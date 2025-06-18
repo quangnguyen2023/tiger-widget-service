@@ -5,16 +5,14 @@ import {
   Get,
   Param,
   Post,
-  Put,
+  Patch,
   NotFoundException,
   BadRequestException,
   InternalServerErrorException,
   ConflictException,
 } from '@nestjs/common';
-import { widgetsTable } from 'src/db/schema';
+import { CreateWidgetDto, UpdateWidgetDto } from 'src/widgets/dto/widgets.dto';
 import { WidgetsService } from 'src/widgets/widgets.service';
-
-type Widget = typeof widgetsTable.$inferInsert;
 
 @Controller('widgets')
 export class WidgetsController {
@@ -43,7 +41,7 @@ export class WidgetsController {
   }
 
   @Post()
-  async create(@Body() createWidgetDto: Widget) {
+  async create(@Body() createWidgetDto: CreateWidgetDto) {
     try {
       if (!createWidgetDto) {
         throw new BadRequestException('Invalid widget data');
@@ -54,8 +52,11 @@ export class WidgetsController {
     }
   }
 
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() updateWidgetDto: Widget) {
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateWidgetDto: UpdateWidgetDto,
+  ) {
     try {
       const updatedWidget = await this.widgetService.update(
         id,
