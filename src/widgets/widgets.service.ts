@@ -24,6 +24,7 @@ export class WidgetsService {
       }
 
       const widgets = await this.db.select().from(widgetsTable);
+      console.log('🚀 ~ widgets:', widgets);
 
       if (!Array.isArray(widgets)) {
         throw new Error('Invalid response from database');
