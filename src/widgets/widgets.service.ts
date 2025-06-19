@@ -16,8 +16,19 @@ export class WidgetsService {
   ) {}
 
   async findAll() {
+    console.log('🚀 ~ db:', this.db);
+
     try {
-      return await this.db.select().from(widgetsTable);
+      if (!this.db) {
+        throw new Error('Database connection is not initialized');
+      }
+
+      const widgets = await this.db.select().from(widgetsTable);
+
+      if (!Array.isArray(widgets)) {
+        throw new Error('Invalid response from database');
+      }
+      return widgets;
     } catch (error) {
       throw new Error(`Failed to fetch widgets: ${error.message}`);
     }
