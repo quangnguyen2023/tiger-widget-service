@@ -16,20 +16,8 @@ export class WidgetsService {
   ) {}
 
   async findAll() {
-    console.log('🚀 ~ db:', this.db);
-
     try {
-      if (!this.db) {
-        throw new Error('Database connection is not initialized');
-      }
-
-      const widgets = await this.db.select().from(widgetsTable);
-      console.log('🚀 ~ widgets:', widgets);
-
-      if (!Array.isArray(widgets)) {
-        throw new Error('Invalid response from database');
-      }
-      return widgets;
+      return await this.db.select().from(widgetsTable);
     } catch (error) {
       throw new Error(`Failed to fetch widgets: ${error.message}`);
     }
@@ -60,7 +48,9 @@ export class WidgetsService {
       .where(eq(widgetsTable.id, createWidgetDto.id));
 
     if (existing.length > 0) {
-      throw new ConflictException('A widget with this id already exists');
+      throw new ConflictException(
+        `A widget with this id (${createWidgetDto.id}) already exists`,
+      );
     }
 
     try {
