@@ -8,17 +8,15 @@ import { Client } from 'pg';
     {
       provide: 'DRIZZLE_DB',
       useFactory: async () => {
-        const { DATABASE_URL } = process.env;
+        const connectionString = process.env.DATABASE_URL;
 
-        if (!DATABASE_URL) {
+        if (!connectionString) {
           throw new Error(
             'DATABASE_URL is not defined in environment variables',
           );
         }
 
-        const client = new Client({
-          connectionString: DATABASE_URL,
-        });
+        const client = new Client({ connectionString });
         await client.connect();
         console.log('Connected to the database');
         return drizzle(client);
