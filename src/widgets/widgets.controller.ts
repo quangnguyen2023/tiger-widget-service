@@ -10,6 +10,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
   ConflictException,
+  Query,
 } from '@nestjs/common';
 import { CreateWidgetDto, UpdateWidgetDto } from 'src/widgets/dto/widgets.dto';
 import { WidgetsService } from 'src/widgets/widgets.service';
@@ -24,6 +25,16 @@ export class WidgetsController {
       return await this.widgetService.findAll();
     } catch (error) {
       this.handleError(error, 'Failed to retrieve widgets');
+    }
+  }
+
+  @Get()
+  async findByType(@Query('type') type: string) {
+    try {
+      const widgets = await this.widgetService.findByType(type);
+      return widgets;
+    } catch (err) {
+      this.handleError(err, 'Failed to retrieve widgets by type');
     }
   }
 

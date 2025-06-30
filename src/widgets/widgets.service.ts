@@ -23,6 +23,18 @@ export class WidgetsService {
     }
   }
 
+  async findByType(type: string) {
+    try {
+      const results = await this.db
+        .select()
+        .from(widgetsTable)
+        .where(eq(widgetsTable.type, type));
+      return results;
+    } catch (err) {
+      return [];
+    }
+  }
+
   async findOne(id: string) {
     try {
       const results = await this.db
