@@ -20,21 +20,14 @@ export class WidgetsController {
   constructor(private readonly widgetService: WidgetsService) {}
 
   @Get()
-  async findAll() {
+  async findAll(@Query('type') type: string) {
     try {
+      if (type) {
+        return await this.widgetService.findByType(type);
+      }
       return await this.widgetService.findAll();
     } catch (error) {
       this.handleError(error, 'Failed to retrieve widgets');
-    }
-  }
-
-  @Get()
-  async findByType(@Query('type') type: string) {
-    try {
-      const widgets = await this.widgetService.findByType(type);
-      return widgets;
-    } catch (err) {
-      this.handleError(err, 'Failed to retrieve widgets by type');
     }
   }
 
