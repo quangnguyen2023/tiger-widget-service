@@ -4,7 +4,9 @@ import {
   timestamp,
   varchar,
   boolean,
+  uuid,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const widgetsTable = pgTable('widgets', {
   id: varchar({ length: 50 }).primaryKey(),
@@ -16,7 +18,9 @@ export const widgetsTable = pgTable('widgets', {
 });
 
 export const usersTable = pgTable('users', {
-  id: varchar('id', { length: 36 }).primaryKey(),
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   email: varchar('email', { length: 100 }).unique().notNull(),
   name: varchar('name', { length: 50 }),
   avatar: varchar('avatar', { length: 200 }),
@@ -27,8 +31,10 @@ export const usersTable = pgTable('users', {
 });
 
 export const accountsTable = pgTable('accounts', {
-  id: varchar('id', { length: 36 }).primaryKey(),
-  userId: varchar('user_id', { length: 36 }).references(() => usersTable.id, {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: uuid('user_id').references(() => usersTable.id, {
     onDelete: 'cascade',
   }),
   provider: varchar('provider', { length: 20 }).notNull(), // 'google', 'twitter', 'credentials'
