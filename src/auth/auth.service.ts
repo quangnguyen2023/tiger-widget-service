@@ -34,7 +34,7 @@ export class AuthService {
     }
 
     const { password: _, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword };
+    return userWithoutPassword;
   }
 
   async signUp({ name, email, password }: SignUpDto) {
