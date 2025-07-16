@@ -5,17 +5,74 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { SignUpDto } from 'src/auth/dto/sign-up.dto';
-import { usersTable } from 'src/db/schema';
+import { accountsTable, usersTable } from 'src/db/schema';
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from 'src/auth/dto/sign-in.dto';
+import { OAuthProfileDto } from 'src/auth/dto/oauth-profile.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject('DRIZZLE_DB') private readonly db: ReturnType<typeof drizzle>,
   ) {}
+
+  async handleOAuth(profile: OAuthProfileDto) {
+    // Tìm account theo profileAccountId trong accountsTable
+    const [account] = await this.db
+      .select()
+      .from(accountsTable)
+      .where(
+        and(
+          eq(accountsTable.provider, profile.provider),
+          eq(accountsTable.providerAccountId, profile.providerAccountId),
+        ),
+      );
+
+    // Nếu tồn tại account -> trả về user info trong bảng users
+    if (account) {
+      const [user] = await this.db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.id, account.userId as string));
+      return user;
+    }
+
+    // Nếu không, tiếp tục Tìm user theo profile.email trong usersTable
+    let [user] = await this.db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, profile.email));
+
+    // Nếu không có user, tạo mới user theo info từ profile
+    if (!user) {
+      const [newUser] = await this.db
+        .insert(usersTable)
+        .values({
+          email: profile.email,
+          name: profile.name,
+          avatar: profile.avatar,
+          emailVerified: true,
+        })
+        .returning();
+      user = newUser;
+    }
+
+    // Tạo account mới liên kết user với provider
+    await this.db.insert(accountsTable).values({
+      userId: user.id,
+      provider: profile.provider,
+      providerAccountId: profile.providerAccountId,
+      accessToken: profile.accessToken,
+      refreshToken: profile.refreshToken,
+      tokenType: profile.tokenType,
+      scope: profile.scope,
+      expiresAt: profile.expiresAt,
+    });
+
+    return user;
+  }
 
   async signIn({ email, password }: SignInDto) {
     const [user] = await this.db
