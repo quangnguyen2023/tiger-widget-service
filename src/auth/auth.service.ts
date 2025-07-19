@@ -11,6 +11,7 @@ import { accountsTable, usersTable } from 'src/db/schema';
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from 'src/auth/dto/sign-in.dto';
 import { OAuthProfileDto } from 'src/auth/dto/oauth-profile.dto';
+import { numberToTimestamp } from 'utils';
 
 @Injectable()
 export class AuthService {
@@ -68,7 +69,9 @@ export class AuthService {
       refreshToken: profile.refreshToken,
       tokenType: profile.tokenType,
       scope: profile.scope,
-      expiresAt: profile.expiresAt,
+      expiresAt: profile.expiresAt
+        ? (numberToTimestamp(profile.expiresAt) as Date)
+        : null,
     });
 
     return user;

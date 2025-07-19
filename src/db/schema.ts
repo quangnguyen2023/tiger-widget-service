@@ -5,6 +5,7 @@ import {
   varchar,
   boolean,
   uuid,
+  text,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -39,10 +40,10 @@ export const accountsTable = pgTable('accounts', {
   }),
   provider: varchar('provider', { length: 20 }).notNull(), // 'google', 'twitter', 'credentials'
   providerAccountId: varchar('provider_account_id', { length: 50 }).notNull(),
-  accessToken: varchar('access_token', { length: 200 }),
-  refreshToken: varchar('refresh_token', { length: 200 }),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
   tokenType: varchar('token_type', { length: 20 }),
-  scope: varchar('scope', { length: 100 }),
+  scope: text('scope'),
   expiresAt: timestamp('expires_at'),
   createdAt: timestamp('created_at').defaultNow(),
 });

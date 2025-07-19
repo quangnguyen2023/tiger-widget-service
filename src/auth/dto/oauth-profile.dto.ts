@@ -1,4 +1,4 @@
-import { IsDate, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class OAuthProfileDto {
   @IsString()
@@ -34,7 +34,8 @@ export class OAuthProfileDto {
   @IsOptional()
   scope?: string;
 
+  @IsNumber()
   @IsDate()
   @IsOptional()
-  expiresAt?: Date;
+  expiresAt?: Date | number | null;
 }

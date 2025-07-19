@@ -20,6 +20,7 @@ export class AuthController {
 
   @Post('oauth')
   async oauthSignInOrSignUp(@Body() profile: OAuthProfileDto) {
+    // console.log('profile rececived: ', profile);
     return await this.authService.handleOAuth(profile);
   }
 }
