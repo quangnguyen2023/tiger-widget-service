@@ -35,7 +35,6 @@ export class OAuthProfileDto {
   scope?: string;
 
   @IsNumber()
-  @IsDate()
   @IsOptional()
   expiresAt?: Date | number | null;
 }
