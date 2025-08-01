@@ -12,11 +12,13 @@ import * as bcrypt from 'bcrypt';
 import { SignInDto } from 'src/auth/dto/sign-in.dto';
 import { OAuthProfileDto } from 'src/auth/dto/oauth-profile.dto';
 import { numberToTimestamp } from 'utils';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject('DRIZZLE_DB') private readonly db: ReturnType<typeof drizzle>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async handleOAuth(profile: OAuthProfileDto) {
@@ -94,7 +96,14 @@ export class AuthService {
     }
 
     const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+
+    const payload = { sub: user.id, email: user.email };
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      user: userWithoutPassword,
+      accessToken,
+    };
   }
 
   async signUp({ name, email, password }: SignUpDto) {
